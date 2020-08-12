@@ -6,5 +6,7 @@
 /*Index*/
  int IC;
  int DC;
+ int DCF;
+ int ICF;
 /*symbol data_table[MAX_DATA_LENGTH];*/
 

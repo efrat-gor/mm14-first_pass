@@ -1,6 +1,8 @@
 #include <stdio.h>
-#define MAX_LABEL_LENGTH 100
+#define MAX_LABEL_LENGTH 31
 #define MAX_LINE_LENGTH 80
+#define IC_INITIAL_VALUE 100
+#define DC_INITIAL_VALUE 0
 /*globals*/
 int line_counter, error_flag,operation_index,symbol_flag;
 
@@ -31,7 +33,7 @@ typedef union
     word_number number;
 }code ;
 typedef struct{
-    unsigned ch:24
+    signed ch:24
 }data;
 
 typedef struct{

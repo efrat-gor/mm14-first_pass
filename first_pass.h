@@ -11,6 +11,8 @@ extern symbol* head_symbol;
 /*Index*/
 extern int  IC;
 extern int DC;
+extern int DCF;
+extern int ICF;
 extern code  code_table[MAX_INSTRACTION_LENGTH];
 extern data  data_table[MAX_DATA_LENGTH];
 
@@ -23,3 +25,9 @@ void operation (char * line,int index,int len_op);
 int operands(char *line,int index,char * kind);
 int is_operation(char * str);
 int advance_space (char *line,int index);
+void data_to_data(char *line,int index);
+int check_after_operation(char* line,int index);
+void update_symbol_table();
+void external(char* line,int index);
+int empty_or_comment_line(char*line,int index);
+void print_symbol_table();/*remove after*/
