@@ -1,2 +1,3 @@
- #include <definition.h>
- void initialize_line(char *line);
+ #include "first_pass.h"
+ 
+void initialize_line(char *line);

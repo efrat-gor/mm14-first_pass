@@ -3,6 +3,7 @@
 Assumptions: *Source files names with '.as' extension. *Each source program provided as input has a possible maximum size. *Excess "white spaces" are ignored in an assembly language input file. *Lowercase and upper case letters are considered different in the assembly language. *Assembly language supports the representation of integers on a decimal base only. *There must be a white character separating (one or more) between command/label and operands, except commas.*/
 
 #include "assembler.h"
+#include "auxiliary.h"
 
 
 
@@ -24,7 +25,7 @@ void handle_input(int argc, char** argv)
 	if (argc == 1)
 	{
 		printf("ERROR!! You must send files.\n");
-		error_flag = ON;
+		error_flag =1;
 		exit(0);
 	}
 	/* Loop for all the files the user input */
@@ -34,7 +35,7 @@ void handle_input(int argc, char** argv)
 		if (!file_name)
 		{
 			printf("ERROR!! Memory allocation faild\n");
-			error_flag = ON;
+			error_flag = 1;
 			exit(0);
 		}
 		/*Opening the file in read permission.*/
@@ -47,6 +48,8 @@ void handle_input(int argc, char** argv)
 			printf("ERROR!! File %s cannot be opened. It does not exist or you do not have the appropriate access permission.\n", argv[i]);
 		else
 		{
+			DC = DC_INITIAL_VALUE;
+			IC = IC_INITIAL_VALUE;
 			line_counter = 0;
 			error_flag=0;
 			/*First pass*/
@@ -72,22 +75,23 @@ void handle_input(int argc, char** argv)
 				rewind(fd);
 				/*Zero the parameters before the next analize*/
 				line_counter = 0;
-				initialize_line(line);
+				/*initialize_line(line);*/
 				ICF=IC-100;
                 DCF=DC;
 				/*Update the address of the guide labels in the symbal table*/
 				 update_symbol_table(); 
 				/*Second pass*/
+				/*
 				while (!feof(fd))
 				{
-					/*Second analize*/
+					
 					analize_2_second_pass(line);
 					line_counter++;
 					fgets(line, MAX_LINE_LENGTH, fd);
 				}
-				/*Close file*/
+				
 				fclose(fd); 
-				/*If there is no errors build output, else- the errors will be printed to screen*/
+				
 				if (!error_flag)
 				{
 					create_object_file();
@@ -95,19 +99,13 @@ void handle_input(int argc, char** argv)
 					create_external_file();
 					printf("The file %s has been successfully compiled\n", argv[i]);
 				}
-				/*Initialization: zero the data table i, code table i, data counter, instruction counter*/
-				D = 0; 
-				I = 0; 
-				DC = DC_INITIAL_VALUE;
-				IC = IC_INITIAL_VALUE;
-				line_counter = 0;
-				/*Clean & Free all tables.*/
+				
 				free(file_name);
 				free_data_table();
 				free_code_table(); 
 				free_symbol_table(); 
 				free_entries_list();
-				free_externals_list();
+				free_externals_list();*/
 			}
 		}
 	}/*End of for loop to open the files which givven from CMD by their names*/

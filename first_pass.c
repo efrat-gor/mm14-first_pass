@@ -15,7 +15,7 @@ int empty_or_comment_line(char*line,int index)
     {
         index++;
         /*try to find the end of the comment*/
-        while(!(*(line+index)=='/'&&*(line+index+1)=='*')&&index<=MAX_LINE_LENGTH-1)
+        while(!(*(line+index)=='*'&&*(line+index+1)=='/')&&index<=MAX_LINE_LENGTH-1)
         {
             index++;
         }
@@ -30,41 +30,47 @@ int empty_or_comment_line(char*line,int index)
     return 0;
 
 }
+/*the function check the line step by step and send to the fit function that will helpus to discover and insert to the symbol  and data table 
+and count how many words for each operation
+the function get two variables : line-the current line
+index to know where we are in the line*/
 void discover_line(char *line,int index)
-{   int len_op=0,i;
+{   /*for saving the len of operation*/
+    int len_op=0;   
     index=advance_space(line,index);
+    /*if comment or empty line so return  'cause we dont need to do anything*/
     if(empty_or_comment_line(line,index))
     {
         /*pass to the next line*/
         return;
     }
-    i=index;
-    /*remove after*/
-    while(*(line+i))
-      printf("%c",*(line+ i++));
-    printf("\n");
+    /*deal with  entry*/
     if(!strncmp(".entry",line+index,6))
     {
         return;
     }
+    /* deal with extern*/
     if(!strncmp(".extern",line+index,7))
     {
        external(line,index+7);
     }
+    /*deal with .string -insert to data*/
     if(!strncmp(".string",line+index,7))
     {
         string_to_data (line,index+7);
     }
+    /*deal with .data-insert to data*/
     if(!strncmp(".data",line+index,5))
     {
         data_to_data(line,index+5);
     }
-    /*if it a symbol*/
+    /*if it a symbol insert to symbol table*/
     if(is_label(line,index))
     {
        /*it is a label*/
     }
-    else if(len_op=is_operation(line+index))  /*operation*/
+    /*operation (chech how many words each one takke and increase the IC*/
+    else if(len_op=is_operation(line+index))  
     {
         operation(line,index,len_op);       
     }
@@ -83,6 +89,7 @@ void external(char* line,int index)
 	}
     /*getting the lenght of the symbol name*/
 	for (i = index; *(line+i) != '\0' && *(line+i) != '\n' && *(line+i) != ' '; i++);
+    /*bigger than the max length that allowed*/
 	if (i > MAX_LABEL_LENGTH)
 	{
 		printf("ERROR!! line %d: Label is too long\n", line_counter);
@@ -150,7 +157,6 @@ void data_to_data(char *line,int index)
         if(!first_entry)
         { 
             index=advance_space(line,index);
-            printf("%c\n",*(line+index));/*remove after*/
             if(*(line+index)!=',')
             {
                  printf("WARNING . in line %d missing comma between digits  ",line_counter);
@@ -173,7 +179,6 @@ void data_to_data(char *line,int index)
         }
     }
      /*usually positive*/
-    printf("%c\n",*(line+index));/*remove after*/
     flag_negetive=1;
     index=advance_space(line,index);
     /*update the flag for negative number and checking if number after sign*/
@@ -187,7 +192,6 @@ void data_to_data(char *line,int index)
         index=advance_space(line,index);
         if(!isdigit(*(line+index)))
         {
-          printf("%c\n",*(line+index));/*remove after*/
           printf("WARNING . in line %d not a digit ",line_counter);
           error_flag=1;
           return;
@@ -207,7 +211,6 @@ void data_to_data(char *line,int index)
           return;
     }
     data_table[DC++].ch=digit*flag_negetive;
-     printf("%d\n",data_table[DC-1].ch);/*remove after*/
     /*for checking if there is a comma if theer are more than 1 digit*/
     first_entry=0;
     index=advance_space(line,index);
@@ -248,7 +251,7 @@ void string_to_data(char*line ,int index)
         index++;
     /*till the string get finshis  insert the asci to the data table*/
       while(*(line+index)&&*(line+index)!='\"')
-         {printf("i am here\n");/**remve after*/
+         {
            data_table[DC++].ch=*(line+index++);
          }
       if(*(line+index)!='\"')
@@ -257,10 +260,6 @@ void string_to_data(char*line ,int index)
         error_flag=1;
        }
        data_table[DC++].ch=0;/*last word of every string is 0 (to know that the string get finish)*/
-       while (data_table[i].ch)/*remove after*/
-       {
-       printf("%c",data_table[i++].ch);
-       }
     }
     
 }
@@ -281,10 +280,10 @@ void label (char * line,int index,char name[MAX_LABEL_LENGTH])
     }
     if(!exsist_symbol(name))
     {
-    temp->next=head_symbol;
-    head_symbol=temp;
-    strcpy(head_symbol->symbol_name,name);
-    if (*(line+index) == '.')
+      temp->next=head_symbol;
+      head_symbol=temp;
+      strcpy(head_symbol->symbol_name,name);
+      if (*(line+index) == '.')
 			{  
 				/*If its guide statement*/
 				head_symbol->address = DC;
@@ -299,9 +298,8 @@ void label (char * line,int index,char name[MAX_LABEL_LENGTH])
 				else
 					/*Sends again to analize to find out if its string or data*/
 					discover_line(line,index);  
-			}
-            
-	else if(is_operation(line+index))
+			}          
+	   else if(is_operation(line+index))
 			{  
 				/*If this is a statement of instruction*/
 				head_symbol->address = IC;
@@ -329,8 +327,9 @@ void label (char * line,int index,char name[MAX_LABEL_LENGTH])
     temp=head_symbol;
     while(temp)
     {
-        if( strcmp(temp->symbol_name,name))
+        if( !strcmp(temp->symbol_name,name))
            return 1;
+        temp=temp->next;
     }
     return 0;
 }
@@ -381,12 +380,10 @@ int operands(char *line, int index, char * kind)
     index=advance_space(line,index);
    
     if(*(line+index)=='r')
-    {   printf("%c\n",*(line+ index));/*remove this ine after*/
+    {  
         index++;
-        printf("%c\n",*(line+index));/*remove this ine after*/
         if(!( (*(line+index)-48) >0 && (*(line+index)-48) <= 7  ))
         {
-           printf("%c\n",*(line+index));/*remove this ine after*/
            printf("WARNING in line %d: not exsisting such a register.\n",line_counter);
            error_flag=1;
         }
@@ -394,7 +391,7 @@ int operands(char *line, int index, char * kind)
     }
     /*need another word*/
     else if(*(line+index)=='#')
-    {    printf("%c\n",*(line+index));/*remove after*/
+    {  
         IC++;/*two lines of instruction are needded*/
         index++;
         index=advance_space(line,index);
@@ -403,7 +400,6 @@ int operands(char *line, int index, char * kind)
             printf("WARNNIG !in line %d : not a number after #.\n",line_counter);
             error_flag=1;                  
          }
-         printf("%c\n",*(line+index));/*remove after*/
         
     }
     

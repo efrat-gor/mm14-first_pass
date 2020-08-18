@@ -13,7 +13,7 @@ void free_all(void * s1,int nbites )
 }
  int main()
  {
-    char *line="                 ";  
+    char *line="   /*fdfgg*/                 ";  
     discover_line(line,0);
    
     

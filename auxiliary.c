@@ -1,3 +1,4 @@
+#include "auxiliary.h"
 /*initialize the ine and clean the text that was there*/
  void initialize_line(char *line)
  {
